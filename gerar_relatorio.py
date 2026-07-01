@@ -8,6 +8,19 @@ from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable,
 )
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+# Registra a fonte Arial (todas as variantes) a partir do Windows.
+pdfmetrics.registerFont(TTFont("Arial", r"C:\Windows\Fonts\arial.ttf"))
+pdfmetrics.registerFont(TTFont("Arial-Bold", r"C:\Windows\Fonts\arialbd.ttf"))
+pdfmetrics.registerFont(TTFont("Arial-Italic", r"C:\Windows\Fonts\ariali.ttf"))
+pdfmetrics.registerFont(TTFont("Arial-BoldItalic", r"C:\Windows\Fonts\arialbi.ttf"))
+# Vincula as variantes para que <b> e <i> funcionem nos Paragraphs.
+pdfmetrics.registerFontFamily(
+    "Arial", normal="Arial", bold="Arial-Bold",
+    italic="Arial-Italic", boldItalic="Arial-BoldItalic",
+)
 
 OUTPUT = "Relatorio_VV_Reserva_Salas.pdf"
 
@@ -23,25 +36,46 @@ doc = SimpleDocTemplate(
 styles = getSampleStyleSheet()
 W = A4[0] - 4 * cm  # largura útil
 
-titulo = ParagraphStyle("titulo", parent=styles["Title"], fontSize=16, spaceAfter=6)
-h1 = ParagraphStyle("h1", parent=styles["Heading1"], fontSize=13, textColor=colors.HexColor("#1a3c6e"), spaceAfter=4)
-h2 = ParagraphStyle("h2", parent=styles["Heading2"], fontSize=11, textColor=colors.HexColor("#2e6da4"), spaceAfter=3)
-normal = ParagraphStyle("normal", parent=styles["Normal"], fontSize=10, leading=14, spaceAfter=4, alignment=TA_JUSTIFY)
-code = ParagraphStyle("code", parent=styles["Code"], fontSize=8, leading=11, spaceAfter=4,
-                       backColor=colors.HexColor("#f4f4f4"), borderPadding=(4, 6, 4, 6))
-center = ParagraphStyle("center", parent=styles["Normal"], fontSize=10, alignment=TA_CENTER)
+BLACK = colors.black
 
-HDR_COLOR = colors.HexColor("#1a3c6e")
-ROW_ALT   = colors.HexColor("#dce6f1")
-WHITE     = colors.white
-BLACK     = colors.black
+titulo = ParagraphStyle("titulo", parent=styles["Title"], fontName="Arial-Bold",
+                        fontSize=16, textColor=BLACK, spaceAfter=6)
+h1 = ParagraphStyle("h1", parent=styles["Heading1"], fontName="Arial-Bold",
+                    fontSize=13, textColor=BLACK, spaceAfter=4)
+h2 = ParagraphStyle("h2", parent=styles["Heading2"], fontName="Arial-Bold",
+                    fontSize=11, textColor=BLACK, spaceAfter=3)
+normal = ParagraphStyle("normal", parent=styles["Normal"], fontName="Arial",
+                        fontSize=10, leading=14, textColor=BLACK, spaceAfter=4,
+                        alignment=TA_JUSTIFY)
+code = ParagraphStyle("code", parent=styles["Code"], fontName="Courier",
+                      fontSize=8, leading=11, textColor=BLACK, spaceAfter=4,
+                      backColor=colors.HexColor("#f4f4f4"), borderPadding=(4, 6, 4, 6))
+center = ParagraphStyle("center", parent=styles["Normal"], fontName="Arial",
+                        fontSize=10, textColor=BLACK, alignment=TA_CENTER)
+
+# Estilos para o CONTEÚDO das células das tabelas (garantem quebra de linha).
+cell = ParagraphStyle("cell", fontName="Arial", fontSize=8, leading=10,
+                      textColor=BLACK, alignment=TA_LEFT)
+cell_hdr = ParagraphStyle("cell_hdr", fontName="Arial-Bold", fontSize=8.5,
+                          leading=10, textColor=BLACK, alignment=TA_CENTER)
+
+HDR_BG  = colors.HexColor("#d9d9d9")   # cinza claro (texto preto legível)
+ROW_ALT = colors.HexColor("#f2f2f2")   # zebra bem clara
+WHITE   = colors.white
+
+
+def P(texto, estilo=cell):
+    """Envolve o texto em Paragraph para que quebre linha dentro da célula."""
+    return Paragraph(texto, estilo)
+
 
 def table_style(has_header=True):
     cmds = [
-        ("FONTNAME",  (0, 0), (-1, -1), "Helvetica"),
+        ("FONTNAME",  (0, 0), (-1, -1), "Arial"),
         ("FONTSIZE",  (0, 0), (-1, -1), 9),
+        ("TEXTCOLOR", (0, 0), (-1, -1), BLACK),
         ("ROWBACKGROUND", (0, 0), (-1, -1), [WHITE, ROW_ALT]),
-        ("GRID",      (0, 0), (-1, -1), 0.4, colors.HexColor("#aaaaaa")),
+        ("GRID",      (0, 0), (-1, -1), 0.4, colors.HexColor("#999999")),
         ("VALIGN",    (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING",  (0, 0), (-1, -1), 5),
         ("RIGHTPADDING", (0, 0), (-1, -1), 5),
@@ -50,9 +84,9 @@ def table_style(has_header=True):
     ]
     if has_header:
         cmds += [
-            ("BACKGROUND", (0, 0), (-1, 0), HDR_COLOR),
-            ("TEXTCOLOR",  (0, 0), (-1, 0), WHITE),
-            ("FONTNAME",   (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("BACKGROUND", (0, 0), (-1, 0), HDR_BG),
+            ("TEXTCOLOR",  (0, 0), (-1, 0), BLACK),
+            ("FONTNAME",   (0, 0), (-1, 0), "Arial-Bold"),
             ("FONTSIZE",   (0, 0), (-1, 0), 9),
         ]
     return TableStyle(cmds)
@@ -63,7 +97,7 @@ story = []
 story.append(Spacer(1, 1.5 * cm))
 story.append(Paragraph("Atividade de Recuperação", titulo))
 story.append(Paragraph("Verificação e Validação de Software", titulo))
-story.append(HRFlowable(width=W, thickness=2, color=HDR_COLOR, spaceAfter=8))
+story.append(HRFlowable(width=W, thickness=2, color=BLACK, spaceAfter=8))
 story.append(Paragraph("Sistema de Reserva de Salas de Estudo", h1))
 story.append(Spacer(1, 0.4 * cm))
 story.append(Paragraph("Aluna: Lygian Monteiro", normal))
@@ -169,13 +203,18 @@ ct_data = [
      "Aprovado"],
 ]
 
-col_w = [1.1*cm, 2.8*cm, 3.2*cm, 3.2*cm, 3.2*cm, 1.6*cm]
-ct_table = Table(ct_data, colWidths=col_w, repeatRows=1)
+# Envolve cada célula em Paragraph para que o texto quebre linha dentro da coluna
+# (evita que as colunas fiquem "quebradas"/sobrepostas). O cabeçalho fica centralizado.
+ct_render = [[P(txt, cell_hdr) for txt in ct_data[0]]]
+for linha in ct_data[1:]:
+    ct_render.append([P(txt, cell) for txt in linha])
+
+col_w = [1.1*cm, 3.0*cm, 3.3*cm, 3.8*cm, 4.0*cm, 1.8*cm]  # soma = 17 cm (largura útil)
+ct_table = Table(ct_render, colWidths=col_w, repeatRows=1)
 ct_table.setStyle(table_style())
 ct_table.setStyle(TableStyle([
-    ("BACKGROUND", (5, 1), (5, -1), colors.HexColor("#c6efce")),
-    ("TEXTCOLOR",  (5, 1), (5, -1), colors.HexColor("#276221")),
-    ("FONTNAME",   (5, 1), (5, -1), "Helvetica-Bold"),
+    ("BACKGROUND", (5, 1), (5, -1), colors.HexColor("#e2efda")),  # verde bem claro
+    ("ALIGN",      (0, 0), (0, -1), "CENTER"),                    # coluna ID centralizada
 ]))
 story.append(ct_table)
 story.append(Spacer(1, 0.5 * cm))
