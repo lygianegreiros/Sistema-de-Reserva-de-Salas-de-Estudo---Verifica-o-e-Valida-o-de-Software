@@ -1,7 +1,7 @@
 # 🏫 Sistema de Reserva de Salas de Estudo
 
 Projeto desenvolvido para a atividade de **Verificação e Validação de Software**.
-O sistema gerencia a reserva de salas de estudo de uma instituição de ensino, substituindo o antigo controle manual feito em planilhas — que causava reservas duplicadas e falta de histórico.
+O sistema gerencia a reserva de salas de estudo de uma instituição de ensino, substituindo o antigo controle manual feito em planilhas, que causava reservas duplicadas e falta de histórico.
 
 O foco do projeto está na **qualidade de software**: análise de requisitos, testes automatizados e cobertura de testes.
 
@@ -117,5 +117,5 @@ O documento **[Relatorio_VV_Reserva_Salas.pdf](Relatorio_VV_Reserva_Salas.pdf)**
 
 ## 👩‍💻 Autora
 
-**Lygian Monteiro**
+**Lygia Maria Negreiros Monteiro**
 Atividade de Recuperação: Verificação e Validação de Software
