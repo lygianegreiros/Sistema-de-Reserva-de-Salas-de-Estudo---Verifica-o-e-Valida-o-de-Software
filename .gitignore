@@ -1,0 +1,19 @@
+# Arquivos temporários do Python
+__pycache__/
+*.pyc
+
+# Cache e relatórios de teste
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Configuração de ferramentas locais
+.claude/
+
+# Arquivos do sistema operacional
+Thumbs.db
+.DS_Store
+
+# Roteiros do vídeo (não fazem parte da entrega no repositório)
+Roteiro_Simples.md
+Roteiro_Video.md
