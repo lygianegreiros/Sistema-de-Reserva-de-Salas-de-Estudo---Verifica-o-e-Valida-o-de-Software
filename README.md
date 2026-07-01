@@ -118,4 +118,4 @@ O documento **[Relatorio_VV_Reserva_Salas.pdf](Relatorio_VV_Reserva_Salas.pdf)**
 ## 👩‍💻 Autora
 
 **Lygian Monteiro**
-Atividade de Recuperação — Verificação e Validação de Software
+Atividade de Recuperação: Verificação e Validação de Software
